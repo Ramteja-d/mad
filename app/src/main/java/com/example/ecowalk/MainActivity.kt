@@ -3,18 +3,29 @@ package com.example.ecowalk
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import com.example.ecowalk.ui.AppRoot
-import com.example.ecowalk.ui.theme.EcoWalkTheme   // ✅ import your custom theme
+import com.example.ecowalk.ui.theme.EcoWalkTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            EcoWalkTheme(    // ✅ apply your green eco theme here
-                darkTheme = false,   // or true / isSystemInDarkTheme()
-                dynamicColor = false // disable wallpaper colors
+            val systemTheme = isSystemInDarkTheme()
+            var isDarkTheme by remember { mutableStateOf(systemTheme) }
+
+            EcoWalkTheme(
+                darkTheme = isDarkTheme,
+                dynamicColor = false
             ) {
-                AppRoot()
+                AppRoot(
+                    isDarkTheme = isDarkTheme,
+                    onThemeChange = { isDarkTheme = it }
+                )
             }
         }
     }
