@@ -7,8 +7,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.ecowalk.data.local.User
+import com.example.ecowalk.ui.theme.EcoWalkTheme
 
 @Composable
 fun ProfileScreen(
@@ -69,5 +71,17 @@ fun ProfileScreen(
         ) {
             Text("Logout")
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ProfileScreenPreview() {
+    EcoWalkTheme {
+        ProfileScreen(
+            user = User(firebaseUid = "1", email = "test@example.com"),
+            onLogout = {},
+            onNavigateToSettings = {}
+        )
     }
 }

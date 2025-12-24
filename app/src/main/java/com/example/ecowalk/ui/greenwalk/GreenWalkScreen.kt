@@ -17,6 +17,8 @@ import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
 import com.example.ecowalk.data.local.GreenWalkEntry
+import androidx.compose.ui.tooling.preview.Preview
+import com.example.ecowalk.ui.theme.EcoWalkTheme
 
 import android.Manifest
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -38,12 +40,39 @@ fun GreenWalkScreen(
         }
     }
 
+    GreenWalkContent(
+        uiState = uiState,
+        walkHistory = walkHistory,
+        onAnalyze = viewModel::analyzeWalk,
+        onStartTracking = {
+            permissionLauncher.launch(
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                )
+            )
+        },
+        onStopTracking = viewModel::stopTracking,
+        onSaveWalk = viewModel::saveCurrentWalk,
+        onNewWalk = viewModel::resetToInput
+    )
+}
+
+@Composable
+fun GreenWalkContent(
+    uiState: GreenWalkUiState,
+    walkHistory: List<GreenWalkEntry>,
+    onAnalyze: (String, String) -> Unit,
+    onStartTracking: () -> Unit,
+    onStopTracking: () -> Unit,
+    onSaveWalk: (Int) -> Unit,
+    onNewWalk: () -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(20.dp)
     ) {
-        // Only show header if NOT tracking to save space/distraction
         if (uiState !is GreenWalkUiState.Tracking) {
             Text(
                 text = "Green Walk",
@@ -55,17 +84,8 @@ fun GreenWalkScreen(
         when (uiState) {
             is GreenWalkUiState.Input -> {
                 InputForm(
-                    onAnalyze = { start, end ->
-                        viewModel.analyzeWalk(start, end)
-                    },
-                    onStartTracking = {
-                        permissionLauncher.launch(
-                            arrayOf(
-                                Manifest.permission.ACCESS_FINE_LOCATION,
-                                Manifest.permission.ACCESS_COARSE_LOCATION
-                            )
-                        )
-                    }
+                    onAnalyze = onAnalyze,
+                    onStartTracking = onStartTracking
                 )
             }
 
@@ -74,32 +94,28 @@ fun GreenWalkScreen(
             }
 
             is GreenWalkUiState.Tracking -> {
-                val trackingState = uiState as GreenWalkUiState.Tracking
                 TrackingView(
-                    state = trackingState,
-                    onStop = { viewModel.stopTracking() }
+                    state = uiState,
+                    onStop = onStopTracking
                 )
             }
 
             is GreenWalkUiState.Results -> {
-                val walk = (uiState as GreenWalkUiState.Results).walk
                 ResultsView(
-                    walk = walk,
-                    onSave = { steps -> viewModel.saveCurrentWalk(steps) },
-                    onNewWalk = { viewModel.resetToInput() }
+                    walk = uiState.walk,
+                    onSave = onSaveWalk,
+                    onNewWalk = onNewWalk
                 )
             }
 
             is GreenWalkUiState.Error -> {
-                val error = (uiState as GreenWalkUiState.Error).message
                 ErrorView(
-                    message = error,
-                    onRetry = { viewModel.resetToInput() }
+                    message = uiState.message,
+                    onRetry = onNewWalk
                 )
             }
         }
 
-        // Walk History (only in Input mode)
         if (walkHistory.isNotEmpty() && uiState is GreenWalkUiState.Input) {
             Spacer(Modifier.height(32.dp))
             Text(
@@ -127,7 +143,7 @@ fun InputForm(
 ) {
     var startLocation by remember { mutableStateOf("") }
     var endLocation by remember { mutableStateOf("") }
-    var inputMode by remember { mutableStateOf(0) } // 0 = Manual, 1 = GPS
+    var inputMode by remember { mutableIntStateOf(0) } // 0 = Manual, 1 = GPS
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -138,7 +154,6 @@ fun InputForm(
             modifier = Modifier.padding(24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Toggle Tab
             TabRow(
                 selectedTabIndex = inputMode,
                 containerColor = MaterialTheme.colorScheme.surface,
@@ -152,7 +167,6 @@ fun InputForm(
             }
 
             if (inputMode == 0) {
-                // Manual Mode
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Default.Search, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                     Spacer(Modifier.width(8.dp))
@@ -203,7 +217,6 @@ fun InputForm(
                     Text("Analyze Green Route")
                 }
             } else {
-                // GPS Mode
                 Column(
                     modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -543,3 +556,55 @@ fun WalkHistoryCard(walk: GreenWalkEntry) {
         }
     }
 }
+
+
+@Preview(showBackground = true)
+@Composable
+fun WalkHistoryCardPreview() {
+    EcoWalkTheme {
+        WalkHistoryCard(
+            walk = GreenWalkEntry(
+                date = "2023-10-27",
+                startLocationName = "Home",
+                endLocationName = "Work",
+                startLat = 0.0,
+                startLng = 0.0,
+                endLat = 0.0,
+                endLng = 0.0,
+                totalDistanceKm = 3.2,
+                greenExposurePercentage = 60.0,
+                routePolyline = ""
+            )
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun GreenWalkContentPreview() {
+    EcoWalkTheme {
+        GreenWalkContent(
+            uiState = GreenWalkUiState.Input,
+            walkHistory = listOf(
+                GreenWalkEntry(
+                    date = "2023-10-27",
+                    startLocationName = "Home",
+                    endLocationName = "Work",
+                    startLat = 0.0,
+                    startLng = 0.0,
+                    endLat = 0.0,
+                    endLng = 0.0,
+                    totalDistanceKm = 3.2,
+                    greenExposurePercentage = 60.0,
+                    routePolyline = ""
+                )
+            ),
+            onAnalyze = { _, _ -> },
+            onStartTracking = {},
+            onStopTracking = {},
+            onSaveWalk = {},
+            onNewWalk = {}
+        )
+    }
+}
+

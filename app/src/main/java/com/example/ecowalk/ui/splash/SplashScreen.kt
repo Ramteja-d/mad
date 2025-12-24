@@ -10,8 +10,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.ecowalk.R
+import com.example.ecowalk.ui.theme.EcoWalkTheme
 
 @Composable
 fun SplashScreen() {
@@ -28,5 +30,13 @@ fun SplashScreen() {
                 .size(120.dp)
                 .clip(RoundedCornerShape(24.dp)) // 👈 adds rounded corners
         )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun SplashScreenPreview() {
+    EcoWalkTheme {
+        SplashScreen()
     }
 }
