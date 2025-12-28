@@ -164,6 +164,11 @@ fun InputForm(
                     onClick = { inputMode = 0 },
                     text = { Text("Plan Route") }
                 )
+                Tab(
+                    selected = inputMode == 1,
+                    onClick = { inputMode = 1 },
+                    text = { Text("GPS Track") }
+                )
             }
 
             if (inputMode == 0) {
@@ -531,7 +536,7 @@ fun WalkHistoryCard(walk: GreenWalkEntry) {
             ) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        "${walk.startLocationName} → ${walk.endLocationName}",
+                        "${walk.startLocationName} \u2192 ${walk.endLocationName}",
                         style = MaterialTheme.typography.bodyMedium
                     )
                     Text(
@@ -608,3 +613,66 @@ fun GreenWalkContentPreview() {
     }
 }
 
+@Preview(showBackground = true)
+@Composable
+fun InputFormPreview() {
+    EcoWalkTheme {
+        InputForm(
+            onAnalyze = { _, _ -> },
+            onStartTracking = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun AnalyzingViewPreview() {
+    EcoWalkTheme {
+        AnalyzingView()
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ResultsViewPreview() {
+    EcoWalkTheme {
+        ResultsView(
+            walk = GreenWalkEntry(
+                date = "2023-10-27",
+                startLocationName = "Start Park",
+                endLocationName = "End Garden",
+                startLat = 0.0,
+                startLng = 0.0,
+                endLat = 0.0,
+                endLng = 0.0,
+                totalDistanceKm = 2.5,
+                greenExposurePercentage = 75.0,
+                routePolyline = ""
+            ),
+            onSave = {},
+            onNewWalk = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun TrackingViewPreview() {
+    EcoWalkTheme {
+        TrackingView(
+            state = GreenWalkUiState.Tracking(distanceKm = 1.2),
+            onStop = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ErrorViewPreview() {
+    EcoWalkTheme {
+        ErrorView(
+            message = "Unable to find a green route between these locations. Please try different spots.",
+            onRetry = {}
+        )
+    }
+}

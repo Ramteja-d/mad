@@ -177,7 +177,7 @@ fun HomeWalkHistoryCard(walk: GreenWalkEntry) {
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    "${walk.startLocationName} → ${walk.endLocationName}",
+                    "${walk.startLocationName} \u2192 ${walk.endLocationName}",
                     style = MaterialTheme.typography.titleSmall,
                     maxLines = 1
                 )
@@ -207,3 +207,38 @@ fun HomeWalkHistoryCard(walk: GreenWalkEntry) {
     }
 }
 
+@Preview(showBackground = true)
+@Composable
+fun HomeScreenPreview() {
+    EcoWalkTheme {
+        HomeScreen(
+            user = User(firebaseUid = "1", email = "walker@example.com"),
+            walkHistory = listOf(
+                GreenWalkEntry(
+                    date = "2023-10-27",
+                    startLocationName = "Central Park",
+                    endLocationName = "Empire State",
+                    startLat = 0.0,
+                    startLng = 0.0,
+                    endLat = 0.0,
+                    endLng = 0.0,
+                    totalDistanceKm = 4.5,
+                    greenExposurePercentage = 85.0,
+                    routePolyline = ""
+                ),
+                GreenWalkEntry(
+                    date = "2023-10-26",
+                    startLocationName = "Home",
+                    endLocationName = "Grocery Store",
+                    startLat = 0.0,
+                    startLng = 0.0,
+                    endLat = 0.0,
+                    endLng = 0.0,
+                    totalDistanceKm = 1.2,
+                    greenExposurePercentage = 40.0,
+                    routePolyline = ""
+                )
+            )
+        )
+    }
+}

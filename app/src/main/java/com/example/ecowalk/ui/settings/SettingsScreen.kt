@@ -61,3 +61,14 @@ fun SettingsScreen(
     }
 }
 
+@Preview(showBackground = true)
+@Composable
+fun SettingsScreenPreview() {
+    EcoWalkTheme {
+        SettingsScreen(
+            onNavigateBack = {},
+            isDarkTheme = false,
+            onThemeChange = {}
+        )
+    }
+}
